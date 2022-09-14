@@ -1,4 +1,10 @@
-import { Text, View, StyleSheet, FlatList } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import colors from "../styles/colors";
 import Header from "../components/Header";
@@ -34,7 +40,7 @@ export default function PlantSelect() {
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [loadedAll, setLoadedAll] = useState(false);
 
   function handleEnviromentSelected(environment: string) {
@@ -74,11 +80,11 @@ export default function PlantSelect() {
   function handleFetchMore(distance: number) {
     if (distance < 1) {
       return;
+    } else {
+      setLoadingMore(true);
+      setPage((oldValue) => oldValue + 1);
+      fetchPlants();
     }
-
-    setLoadingMore(true);
-    setPage((oldValue) => oldValue + 1);
-    fetchPlants();
   }
 
   useEffect(() => {
@@ -133,10 +139,14 @@ export default function PlantSelect() {
           renderItem={({ item }) => <PlantCardPrimary data={item} />}
           showsVerticalScrollIndicator={false}
           numColumns={2}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.3}
           onEndReached={({ distanceFromEnd }) =>
             handleFetchMore(distanceFromEnd)
           }
+          ListFooterComponent={
+            loadingMore ? <ActivityIndicator color={colors.green} /> : null
+          }
+          ListFooterComponentStyle={styles.loadingMore}
         />
       </View>
     </View>
@@ -176,5 +186,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 32,
     justifyContent: "center",
+  },
+  loadingMore: {
+    marginVertical: 40,
   },
 });
