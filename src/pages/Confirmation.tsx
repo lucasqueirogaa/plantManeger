@@ -15,8 +15,8 @@ import fonts from "../styles/fonts";
 export function Confirmation() {
   const navigation = useNavigation();
 
-  function handleSubmit() {
-    navigation.navigate("Confirmation");
+  function handleMoveOn() {
+    navigation.navigate("PlantSelect");
   }
 
   return (
@@ -29,7 +29,7 @@ export function Confirmation() {
             Agora vamos começar a cuidar das suas plantinhas com muito cuidado.
           </Text>
           <View style={styles.footer}>
-            <Button title="Começar" onPress={handleSubmit} />
+            <Button title="Começar" onPress={handleMoveOn} />
           </View>
         </View>
       </TouchableWithoutFeedback>
