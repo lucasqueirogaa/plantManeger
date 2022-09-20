@@ -18,21 +18,11 @@ import waterdrop from "../assets/waterdrop.png";
 import { Button } from "../components/Button";
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
-import { isBefore } from "date-fns";
+import { format, isBefore } from "date-fns";
+import { loadPlant, PlantProps, savePlant } from "../libs/storage";
 
 interface Params {
-  plant: {
-    id: string;
-    name: string;
-    about: string;
-    water_tips: string;
-    photo: string;
-    environments: [string];
-    frequency: {
-      times: number;
-      repeat_every: string;
-    };
-  };
+  plant: PlantProps;
 }
 
 export default function PlantSave() {
@@ -61,6 +51,20 @@ export default function PlantSave() {
     setShowDatePicker((oldState) => !oldState);
   }
 
+  async function handleSave() {
+    const data = await loadPlant();
+    return console.log(data);
+
+    try {
+      await savePlant({
+        ...plant,
+        dateTimeNotification: selectedDateTime,
+      });
+    } catch {
+      Alert.alert("Não foi possível salvar.");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.plantInfo}>
@@ -83,7 +87,6 @@ export default function PlantSave() {
           <DateTimePicker
             value={selectedDateTime}
             mode="time"
-            display="spinner"
             onChange={handleChangeTime}
           />
         )}
@@ -94,12 +97,15 @@ export default function PlantSave() {
               style={styles.dataTimePickerButton}
               onPress={handleOpenDatetimePicker}
             >
-              <Text style={styles.dataTimePickerText}>Mudar horário</Text>
+              <Text style={styles.dataTimePickerText}>{`Mudar ${format(
+                selectedDateTime,
+                "HH:mm"
+              )}`}</Text>
             </TouchableOpacity>
           </>
         )}
 
-        <Button title="Cadastrar planta" onPress={() => {}} />
+        <Button title="Cadastrar planta" onPress={handleSave} />
       </View>
     </View>
   );
@@ -114,7 +120,6 @@ const styles = StyleSheet.create({
   plantInfo: {
     flex: 1,
     paddingHorizontal: 30,
-    paddingVertical: 50,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.shape,
@@ -123,20 +128,19 @@ const styles = StyleSheet.create({
     fontFamily: fonts.heading,
     fontSize: 24,
     color: colors.heading,
-    marginTop: 15,
   },
   plantAbout: {
     textAlign: "center",
     fontFamily: fonts.text,
     color: colors.heading,
     fontSize: 17,
-    marginTop: 10,
+    marginTop: 5,
   },
   controller: {
     backgroundColor: colors.white,
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: getBottomSpace() || 20,
+    paddingTop: 60,
+    paddingBottom: getBottomSpace() || 40,
   },
   tipContainer: {
     flexDirection: "row",
@@ -164,13 +168,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: fonts.complement,
     color: colors.heading,
-    fontSize: 12,
-    marginBottom: 5,
+    fontSize: 16,
   },
   dataTimePickerButton: {
     width: "100%",
     alignItems: "center",
-    paddingVertical: 40,
+    paddingVertical: 20,
   },
   dataTimePickerText: {
     color: colors.heading,
