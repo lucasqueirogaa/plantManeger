@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import colors from "../styles/colors";
@@ -13,6 +14,7 @@ import EnviromentButton from "../components/EnviromentButton";
 import api from "../services/api";
 import PlantCardPrimary from "../components/PlantCardPrimary";
 import Load from "../components/Load";
+import { useNavigation } from "@react-navigation/native";
 
 interface EnviromentProps {
   key: string;
@@ -41,6 +43,8 @@ export default function PlantSelect() {
 
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  const navigation = useNavigation();
 
   function handleEnviromentSelected(environment: string) {
     setEnviromentSelected(environment);
@@ -84,6 +88,10 @@ export default function PlantSelect() {
       setPage((oldValue) => oldValue + 1);
       fetchPlants();
     }
+  }
+
+  function handlePlantSelect(plant: PlantProps) {
+    navigation.navigate("PlantSave", { plant });
   }
 
   useEffect(() => {
@@ -137,7 +145,14 @@ export default function PlantSelect() {
         <FlatList
           data={filteredPlants}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <PlantCardPrimary data={item} />}
+          renderItem={({ item }) => (
+            <PlantCardPrimary
+              data={item}
+              onPress={() => {
+                handlePlantSelect(item);
+              }}
+            />
+          )}
           showsVerticalScrollIndicator={false}
           numColumns={2}
           onEndReachedThreshold={0.3}
