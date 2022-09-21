@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -28,6 +28,7 @@ interface Params {
 export default function PlantSave() {
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(Platform.OS === "ios");
+  const navigation = useNavigation();
 
   const route = useRoute();
   const { plant } = route.params as Params;
@@ -52,13 +53,19 @@ export default function PlantSave() {
   }
 
   async function handleSave() {
-    const data = await loadPlant();
-    return console.log(data);
-
     try {
       await savePlant({
         ...plant,
         dateTimeNotification: selectedDateTime,
+      });
+
+      navigation.navigate("Confirmation", {
+        title: "Tudo certo",
+        subtitle:
+          "Fique tranquilo que sempre vamos lembrar você de cuidar da sua plantinha com muito cuidado.",
+        buttonTitle: "Muito obrigado :D",
+        icon: "hug",
+        nextScreen: "MyPlant",
       });
     } catch {
       Alert.alert("Não foi possível salvar.");
