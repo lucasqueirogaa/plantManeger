@@ -28,27 +28,19 @@ export default function PlantCardSecondary({
   ...rest
 }: PlantProps) {
   return (
-    <Swipeable
-      overshootRight={false}
-      renderRightActions={() => (
-        <Animated.View>
-          <TouchableOpacity style={styles.buttonRemove} onPress={handleRemove}>
-            <Text>
-              <Feather name="trash" size={32} color={colors.white} />
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
+    <TouchableOpacity
+      style={styles.container}
+      onPress={handleRemove}
+      activeOpacity={0.8}
+      {...rest}
     >
-      <TouchableOpacity style={styles.container} activeOpacity={0.8} {...rest}>
-        <SvgFromUri uri={data.photo} width={50} height={50} />
-        <Text style={styles.text}>{data.name}</Text>
-        <View style={styles.details}>
-          <Text style={styles.timeLabel}>Regar às</Text>
-          <Text style={styles.time}>{data.hour}</Text>
-        </View>
-      </TouchableOpacity>
-    </Swipeable>
+      <SvgFromUri uri={data.photo} width={50} height={50} />
+      <Text style={styles.text}>{data.name}</Text>
+      <View style={styles.details}>
+        <Text style={styles.timeLabel}>Regar às</Text>
+        <Text style={styles.time}>{data.hour}</Text>
+      </View>
+    </TouchableOpacity>
   );
 }
 

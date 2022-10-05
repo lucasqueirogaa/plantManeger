@@ -12,19 +12,21 @@ import Header from "../components/Header";
 import colors from "../styles/colors";
 
 import waterdrop from "../assets/waterdrop.png";
-import { loadPlant, PlantProps, StoragePlantProps } from "../libs/storage";
+import { loadPlant, PlantProps, removePlant } from "../libs/storage";
 import { formatDistance } from "date-fns";
 import { pt } from "date-fns/locale";
 import fonts from "../styles/fonts";
 
 import PlantCardSecondary from "../components/PlantCardSecondary";
 import Load from "../components/Load";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 export default function MyPlants() {
   const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextWaterd, setNextWaterd] = useState<string>();
+
+  const navigation = useNavigation();
 
   function handleRemove(plant: PlantProps) {
     Alert.alert("Remover", `Deseja remover a ${plant.name}?`, [
@@ -36,15 +38,7 @@ export default function MyPlants() {
         text: "Sim",
         onPress: async () => {
           try {
-            const data = await AsyncStorage.getItem("@plantmanager:plants");
-            const plants = data ? (JSON.parse(data) as StoragePlantProps) : {};
-
-            delete plants[plant.id];
-
-            await AsyncStorage.setItem(
-              "@plantmanager:plants",
-              JSON.stringify(plants)
-            );
+            await removePlant(plant.id);
 
             setMyPlants((oldData) =>
               oldData.filter((item) => item.id !== plant.id)
@@ -60,6 +54,15 @@ export default function MyPlants() {
   useEffect(() => {
     async function loadStoarageData() {
       const plantStoraged = await loadPlant();
+
+      if (plantStoraged.length === 0) {
+        Alert.alert("Você não tem plantas agendadas!");
+
+        navigation.goBack();
+
+        return;
+      }
+
       const nextTime = formatDistance(
         new Date(plantStoraged[0].dateTimeNotification).getTime(),
         new Date().getTime(),
